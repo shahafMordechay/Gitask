@@ -35,13 +35,13 @@ To use this tool, you need to set up a configuration file and certain environmen
 
 ### Environment Variables
 
-1.	GIRA_AUTH_TOKEN: Your Jira API token. This token is used to authenticate requests to the Jira API. You can create a token from your Jira account settings.
-2.	GIRA_URL: Your Jira base URL (e.g., https://yourcompany.atlassian.net).
-3.	GIRA_CONFIG_PATH (optional): Define a custom path for the config file. If not set, it defaults to ~/gira_config.json.
+1.	JIRA_AUTH_TOKEN: Your Jira API token. This token is used to authenticate requests to the Jira API. You can create a token from your Jira account settings.
+2.	JIRA_URL: Your Jira base URL (e.g., https://yourcompany.atlassian.net).
+3.	GITASK_CONFIG_PATH (optional): Define a custom path for the config file. If not set, it defaults to ~/gira_config.json.
 
 ### gira_config.json
 
-The configuration file should be named gira_config.json and placed either in the home directory (~/gira_config.json) or in a custom directory if you define the GIRA_CONFIG_PATH environment variable.
+The configuration file should be named gira_config.json and placed either in the home directory (~/gira_config.json) or in a custom directory if you define the GITASK_CONFIG_PATH environment variable.
 
 Here’s a sample configuration file:
    ```json
