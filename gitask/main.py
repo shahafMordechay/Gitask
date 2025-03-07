@@ -35,8 +35,8 @@ if __name__ == '__main__':
     try:
         cli()
     except ValueError as ve:
-        click.echo(f"Configuration Error: {ve}", err=True)
+        click.echo(f"Configuration Error: {str(ve)}", err=True)
     except subprocess.CalledProcessError as e:
-        click.echo(f"Subprocess Error: {e}", err=True)
+        click.echo(f"Subprocess Error: {str(e)}", err=True)
     except Exception as e:
-        click.echo(f"An unexpected error occurred: {e}", err=True)
+        click.echo(f"An unexpected error occurred: {str(e)}", err=True)

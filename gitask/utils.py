@@ -16,11 +16,9 @@ class Utils:
         return cls._instance
 
 
-    def __init__(self):
+    def __init_version_control_tool(self):
         self.config = Config()
 
-
-    def __init_version_control_tool(self):
         if self.config.git_repo_type == "gitlab":
             self.vcs: VCSInterface = GitlabUtils()
         else:
