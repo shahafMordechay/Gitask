@@ -1,5 +1,5 @@
-import os
 import json
+import os
 from pathlib import Path
 
 
@@ -20,7 +20,9 @@ class Config:
         return cls._instance
 
     def __load_config(self):
+        """Load configuration from the config file or environment variables."""
         config_path = os.getenv(Config.CONFIG_FILE, os.path.expanduser(Config.DEFAULT_CONFIG_FILE))
+
         try:
             with open(config_path, 'r') as config_file:
                 self.config_data = json.load(config_file)
@@ -40,6 +42,14 @@ class Config:
         return os.getenv(Config.PMT_URL_ENV_VAR)
 
     @property
+    def pmt_type(self):
+        return self.config_data.get('pmt-type').lower()
+
+    @property
+    def vcs_type(self):
+        return self.config_data.get('vcs-type').lower()
+
+    @property
     def git_token(self):
         return os.getenv(Config.GIT_TOKEN_ENV_VAR)
 
@@ -50,10 +60,6 @@ class Config:
     @property
     def git_proj(self):
         return self.config_data.get('git-project')
-
-    @property
-    def git_repo_type(self):
-        return self.config_data.get('git-repo-type')
 
     @property
     def in_progress_status(self):
