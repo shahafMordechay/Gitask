@@ -3,10 +3,16 @@ import sys
 import gitlab
 
 from gitask.config import Config
-from gitask.version_control_tool import VCSInterface
+from gitask.vcs.version_control_tool import VCSInterface
 
 
 def handle_gitlab_errors(func):
+    """
+    Decorator to handle GitLab errors and print meaningful error messages.
+
+    :param func: The function to wrap.
+    :return: The wrapped function.
+    """
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -21,14 +27,18 @@ def handle_gitlab_errors(func):
     return wrapper
 
 
-class GitlabUtils(VCSInterface):
+class GitlabVcs(VCSInterface):
+    """
+    GitlabVcs class implements the VCSInterface for GitLab.
+    """
     _instance = None
 
     def __new__(cls):
         if cls._instance is None:
-            cls._instance = super(GitlabUtils, cls).__new__(cls)
+            cls._instance = super(GitlabVcs, cls).__new__(cls)
             cls._instance.__init_gitlab_client()
         return cls._instance
+
 
     @handle_gitlab_errors
     def __init_gitlab_client(self):
@@ -36,8 +46,9 @@ class GitlabUtils(VCSInterface):
         self.gitlab_client = gitlab.Gitlab(config.git_url, private_token=config.git_token)
         self.gitlab_project = self.gitlab_client.projects.get(config.git_proj)
 
+
     @handle_gitlab_errors
-    def get_user_id_by_name(self, name):
+    def __get_user_id_by_name(self, name):
         users = self.gitlab_client.users.list(search=name)
         if users:
             return users[0].id
@@ -46,11 +57,20 @@ class GitlabUtils(VCSInterface):
 
 
     @handle_gitlab_errors
-    def create_merge_request(self, source_branch, target_branch, title, reviewer):
+    def create_pull_request(self, source_branch, target_branch, title, reviewer):
+        """
+        Create a merge request in GitLab.
+
+        :param source_branch: The source branch for the merge request.
+        :param target_branch: The target branch for the merge request.
+        :param title: The title of the merge request.
+        :param reviewer: The reviewer for the merge request.
+        :return: The created merge request object.
+        """
         mr_data = {
             'source_branch': source_branch,
             'target_branch': target_branch,
             'title': title,
-            'reviewer_ids': [self.get_user_id_by_name(reviewer)]
+            'reviewer_ids': [self.__get_user_id_by_name(reviewer)]
         }
         self.gitlab_project.mergerequests.create(mr_data)

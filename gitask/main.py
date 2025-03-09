@@ -1,25 +1,23 @@
 import subprocess
+
 import click
 
-from gitask.jira_tool import JiraTool
-from gitask.project_management_tool import PMToolInterface
-
-# Create an instance of PMDao to handle the main logic
-pm_tool: PMToolInterface = JiraTool()
+from gitask.commands import Commands
 
 
 @click.command()
 def start_working():
     """Move the current ticket to In Progress."""
-    pm_tool.move_to_in_progress()
+    Commands().move_to_in_progress()
 
 
 @click.command()
-@click.option('--branch', required=False, help='Target branch for merge request.')
+@click.option('--title', required=True, help='Title of the pull request.')
 @click.option('--reviewer', required=True, help='Username of the reviewer.')
-def submit_to_review(branch, reviewer):
-    """Submit the current ticket to In Review and create a merge request."""
-    pm_tool.move_to_in_review(branch, reviewer)
+@click.option('--branch', required=False, help='Target branch for pull request.')
+def submit_to_review(title, reviewer, branch):
+    """Submit the current ticket to In Review and create a pull request."""
+    Commands().move_to_in_review(title, reviewer, branch)
 
 
 @click.group()
