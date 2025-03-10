@@ -1,4 +1,5 @@
 import subprocess
+from email.policy import default
 
 import click
 
@@ -12,7 +13,7 @@ def start_working():
 
 
 @click.command()
-@click.option('--title', required=True, help='Title of the pull request.')
+@click.option('--title', default='',  help='Title of the pull request.')
 @click.option('--reviewer', required=True, help='Username of the reviewer.')
 @click.option('--branch', required=False, help='Target branch for pull request.')
 def submit_to_review(title, reviewer, branch):
