@@ -15,6 +15,6 @@ class VCSInterface(ABC):
         :param target_branch: The target branch for the pull request.
         :param title: The title of the pull request.
         :param reviewer: The reviewer for the pull request.
-        :return: The created pull request object.
+        :return: The created pull request link.
         """
         pass
