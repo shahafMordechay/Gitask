@@ -74,6 +74,26 @@ class JiraPmt(PMToolInterface):
         self.jira_client.transition_issue(issue_key, status)
 
     @handle_jira_errors
+    def find_valid_status_transition(self, issue_key, statuses):
+        """
+        Check if any of the provided statuses can be applied as a valid transition for the given issue.
+
+        :param issue_key: The key of the issue to check.
+        :param statuses: A list of statuses to evaluate.
+        :return: The first valid status if a transition is possible.
+                 Raises an exception if no valid transition is found.
+        """
+        transitions = self.jira_client.transitions(issue_key)
+        valid_transitions = [transition["name"] for transition in transitions if transition["name"] in statuses]
+
+        if not valid_transitions:
+            # noinspection PyUnresolvedReferences
+            current_status = self.jira_client.issue(issue_key).fields.status.name
+            raise ValueError(f"Invalid status transition from current status '{current_status}' for issue '{issue_key}'")
+
+        return valid_transitions[0]
+
+    @handle_jira_errors
     def get_user_by_username(self, username):
         """
         Get a JIRA user object by their username.

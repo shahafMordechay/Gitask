@@ -42,6 +42,7 @@ class Utils:
         :param reviewer: The reviewer for the pull request.
         :param cur_branch: The current branch name.
         :param target_branch: The target branch name.
+        :return The pull request link.
         """
         if cur_branch is None:
             cur_branch = self.get_current_git_branch()
