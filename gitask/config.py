@@ -62,11 +62,11 @@ class Config:
         return self.config_data.get('git-project')
 
     @property
-    def in_progress_status(self):
+    def in_progress_statuses(self):
         return self.config_data.get('in-progress')
 
     @property
-    def in_review_status(self):
+    def in_review_statuses(self):
         return self.config_data.get('in-review')
 
     @property

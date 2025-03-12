@@ -1,3 +1,5 @@
+import click
+
 from gitask.config import Config
 from gitask.pmt.pmt_factory import get_pmt
 from gitask.pmt.project_management_tool import PMToolInterface
@@ -24,8 +26,9 @@ class Commands:
         issue_key = self.utils.get_current_ticket()
 
         # Step 2: Update ticket status
-        in_progress_status = self.config.in_progress_status
+        in_progress_status = self.pmt.find_valid_status_transition(issue_key, self.config.in_progress_statuses)
         self.pmt.update_ticket_status(issue_key, in_progress_status)
+        click.echo(f"Successfully moved ticket to '{in_progress_status}'")
 
     def move_to_in_review(self, title, reviewer, target_branch):
         """
@@ -46,8 +49,10 @@ class Commands:
         self.pmt.update_reviewer(issue_key, reviewer_field, user)
 
         # Step 4: Update ticket status
-        in_review_status = self.config.in_review_status
+        in_review_status = self.pmt.find_valid_status_transition(issue_key, self.config.in_review_statuses)
         self.pmt.update_ticket_status(issue_key, in_review_status)
+        click.echo(f"Successfully moved ticket to '{in_review_status}'")
 
         # Step 5: Create MR
-        self.utils.create_pull_request(self.vcs, title, reviewer, target_branch=target_branch)
+        pr_link = self.utils.create_pull_request(self.vcs, title, reviewer, target_branch=target_branch)
+        click.echo(f"Successfully created merge request: {pr_link}")

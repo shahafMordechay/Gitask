@@ -1,5 +1,7 @@
+import json
 import sys
 
+import click
 import gitlab
 
 from gitask.config import Config
@@ -21,7 +23,7 @@ def handle_gitlab_errors(func):
             if len(error_message) == 1:
                 error_message = error_message[0]
 
-            print(error_message)
+            click.echo(error_message)
             sys.exit(1)
 
     return wrapper
@@ -65,7 +67,7 @@ class GitlabVcs(VCSInterface):
         :param target_branch: The target branch for the merge request.
         :param title: The title of the merge request.
         :param reviewer: The reviewer for the merge request.
-        :return: The created merge request object.
+        :return: The created merge request link.
         """
         mr_data = {
             'source_branch': source_branch,
@@ -73,4 +75,15 @@ class GitlabVcs(VCSInterface):
             'title': title,
             'reviewer_ids': [self.__get_user_id_by_name(reviewer)]
         }
-        self.gitlab_project.mergerequests.create(mr_data)
+
+        try:
+            merge_request = self.gitlab_project.mergerequests.create(mr_data)
+        except gitlab.exceptions.GitlabError as e:
+            try:
+                mrs = self.gitlab_project.mergerequests.list(source_branch=source_branch, state="opened")
+                click.echo(mrs[0].web_url)
+                raise e
+            except (json.JSONDecodeError, TypeError):
+                raise e
+
+        return merge_request.web_url
