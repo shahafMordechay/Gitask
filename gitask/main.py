@@ -27,13 +27,14 @@ def start_working():
 
 
 @click.command(name='submit-to-review')
-@click.option('--title', default='',  help='Title of the pull request.')
-@click.option('--reviewer', required=True, help='Username of the reviewer.')
-@click.option('--branch', required=False, help='Target branch for pull request.')
+@click.option('-t', '--title', default='',  help='Title of the pull request.')
+@click.option('-r', '--reviewer', required=True, help='Username of the reviewer.')
+@click.option('-b', '--branch', required=False, help='Target branch for pull request.')
+@click.option('--pr-only', '--pull-request-only', is_flag=True, required=False, help='Create only the pull request.')
 @handle_exceptions
-def submit_to_review(title, reviewer, branch):
+def submit_to_review(title, reviewer, branch, pr_only):
     """Submit the current ticket to In Review and create a pull request."""
-    Commands().move_to_in_review(title, reviewer, branch)
+    Commands().move_to_in_review(title, reviewer, branch, pr_only)
 
 
 @click.group(context_settings={"max_content_width": 120})
