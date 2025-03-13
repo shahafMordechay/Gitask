@@ -1,4 +1,4 @@
-from gitask.config import Config
+from gitask.config.config import Config
 from gitask.pmt.jira_pmt import JiraPmt
 
 

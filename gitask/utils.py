@@ -1,6 +1,15 @@
+import json
+import os
 import subprocess
 
-from gitask.config import Config
+from gitask.config.config import Config
+
+
+def save_json_to_file(file_path, data):
+    """Save the configuration JSON data to the config file."""
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, 'w') as f:
+        json.dump(data, f, indent=4)
 
 
 class Utils:

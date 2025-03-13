@@ -1,15 +1,23 @@
 import json
 import os
-from pathlib import Path
 
 
 class Config:
     CONFIG_FILE = "GITASK_CONFIG_PATH"
-    DEFAULT_CONFIG_FILE = Path.home() / ".config" / "gitask" / "config.json"
+    DEFAULT_CONFIG_FILE = "~/.config/gitask/config.json"
     PMT_TOKEN_ENV_VAR = "GITASK_PMT_TOKEN"
     PMT_URL_ENV_VAR = "GITASK_PMT_URL"
     GIT_TOKEN_ENV_VAR = "GITASK_GIT_TOKEN"
     GIT_URL_ENV_VAR = "GITASK_GIT_URL"
+    PMT_TYPE_PROP_NAME = "pmt-type"
+    VCS_TYPE_PROP_NAME = "vcs-type"
+    GIT_PROJECT_PROP_NAME = "git-project"
+    IN_PROGRESS_PROP_NAME = "in-progress"
+    IN_REVIEW_PROP_NAME = "in-review"
+    REVIEWER_FIELD_PROP_NAME = "reviewer-field"
+    GIT_BRANCH_FIELD_PROP_NAME = "git-branch-field"
+    CURRENT_TICKET_PROP_NAME = "current-ticket"
+
 
     _instance = None
 
@@ -43,11 +51,11 @@ class Config:
 
     @property
     def pmt_type(self):
-        return self.config_data.get('pmt-type').lower()
+        return self.config_data.get(Config.PMT_TYPE_PROP_NAME).lower()
 
     @property
     def vcs_type(self):
-        return self.config_data.get('vcs-type')
+        return self.config_data.get(Config.VCS_TYPE_PROP_NAME)
 
     @property
     def git_token(self):
@@ -59,24 +67,24 @@ class Config:
 
     @property
     def git_proj(self):
-        return self.config_data.get('git-project')
+        return self.config_data.get(Config.GIT_PROJECT_PROP_NAME)
 
     @property
     def in_progress_statuses(self):
-        return self.config_data.get('in-progress')
+        return self.config_data.get(Config.IN_PROGRESS_PROP_NAME)
 
     @property
     def in_review_statuses(self):
-        return self.config_data.get('in-review')
+        return self.config_data.get(Config.IN_REVIEW_PROP_NAME)
 
     @property
     def reviewer_field(self):
-        return self.config_data.get('reviewer-field')
+        return self.config_data.get(Config.REVIEWER_FIELD_PROP_NAME)
 
     @property
     def git_branch_field(self):
-        return self.config_data.get('git-branch-field')
+        return self.config_data.get(Config.GIT_BRANCH_FIELD_PROP_NAME)
 
     @property
     def current_ticket_script(self):
-        return self.config_data.get('current-ticket')
+        return self.config_data.get(Config.CURRENT_TICKET_PROP_NAME)
