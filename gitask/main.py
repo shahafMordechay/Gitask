@@ -1,3 +1,4 @@
+import functools
 import subprocess
 
 import click
@@ -7,6 +8,7 @@ from gitask.commands import Commands
 
 def handle_exceptions(func):
     """Decorator to handle exceptions and print user-friendly error messages."""
+    @functools.wraps(func) # To preserve Click's metadata
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -34,7 +36,7 @@ def submit_to_review(title, reviewer, branch):
     Commands().move_to_in_review(title, reviewer, branch)
 
 
-@click.group()
+@click.group(context_settings={"max_content_width": 120})
 def cli():
     # enable the use of subcommands
     pass
