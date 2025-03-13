@@ -4,7 +4,7 @@ import sys
 import click
 import gitlab
 
-from gitask.config import Config
+from gitask.config.config import Config
 from gitask.vcs.version_control_tool import VCSInterface
 
 

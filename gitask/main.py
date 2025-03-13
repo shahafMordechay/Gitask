@@ -19,6 +19,13 @@ def handle_exceptions(func):
     return wrapper
 
 
+@click.command(name='configure')
+@click.option('--auto-complete', is_flag=True, required=False,  help='Setup gitask autocompletion.')
+@handle_exceptions
+def configure(auto_complete):
+    """Configure Gitask with the necessary settings."""
+    Commands.configure(auto_complete)
+
 @click.command(name='start-working')
 @handle_exceptions
 def start_working():
@@ -26,7 +33,7 @@ def start_working():
     Commands().move_to_in_progress()
 
 
-@click.command(name='submit-to-review')
+@click.command(name='submit-to-review', short_help='Submit the current ticket to In Review and create a pull request.')
 @click.option('-t', '--title', default='',  help='Title of the pull request.')
 @click.option('-r', '--reviewer', required=True, help='Username of the reviewer.')
 @click.option('-b', '--branch', required=False, help='Target branch for pull request.')
@@ -43,6 +50,7 @@ def cli():
     pass
 
 
+cli.add_command(configure)
 cli.add_command(start_working)
 cli.add_command(submit_to_review)
 
