@@ -1,6 +1,7 @@
 import click
 
-from gitask.config import Config
+from gitask.config.config import Config
+from gitask.config.config_utils import setup_autocomplete, interactive_setup
 from gitask.pmt.pmt_factory import get_pmt
 from gitask.pmt.project_management_tool import PMToolInterface
 from gitask.utils import Utils
@@ -58,3 +59,20 @@ class Commands:
         # Step 5: Create MR
         pr_link = self.utils.create_pull_request(self.vcs, title, reviewer, target_branch=target_branch)
         click.echo(f"Successfully created merge request: {pr_link}")
+
+    @staticmethod
+    def configure(auto_complete):
+        """
+        Configure Gitask with the necessary settings.
+
+        This function handles the configuration of Gitask.
+        If the `auto_complete` flag is set, it will only set up autocompletion.
+        Otherwise, it will run the interactive setup to configure all relevant data for Gitask.
+
+        :param auto_complete: Flag to indicate if only autocompletion should be set up.
+        """
+        if auto_complete:
+            setup_autocomplete()
+            return
+
+        interactive_setup()

@@ -4,7 +4,7 @@ import sys
 import requests
 from jira import JIRA, JIRAError
 
-from gitask.config import Config
+from gitask.config.config import Config
 from gitask.pmt.project_management_tool import PMToolInterface
 from gitask.utils import Utils
 
