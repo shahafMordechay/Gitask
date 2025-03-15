@@ -26,10 +26,18 @@ def configure(auto_complete):
     """Configure Gitask with the necessary settings."""
     Commands.configure(auto_complete)
 
-@click.command(name='start-working')
+
+@click.command(name='open')
+@handle_exceptions
+def reopen():
+    """Move the current ticket to To Do status."""
+    Commands().move_to_to_do()
+
+
+@click.command(name='start-working', short_help='Move the current ticket to In Progress status.')
 @handle_exceptions
 def start_working():
-    """Move the current ticket to In Progress."""
+    """Move the current ticket to In Progress status."""
     Commands().move_to_in_progress()
 
 
@@ -44,6 +52,13 @@ def submit_to_review(title, reviewer, branch, pr_only):
     Commands().move_to_in_review(title, reviewer, branch, pr_only)
 
 
+@click.command(name='done')
+@handle_exceptions
+def done():
+    """Move the current ticket to Done status."""
+    Commands().move_to_done()
+
+
 @click.group(context_settings={"max_content_width": 120})
 def cli():
     # enable the use of subcommands
@@ -51,8 +66,10 @@ def cli():
 
 
 cli.add_command(configure)
+cli.add_command(reopen)
 cli.add_command(start_working)
 cli.add_command(submit_to_review)
+cli.add_command(done)
 
 if __name__ == '__main__':
     cli()
