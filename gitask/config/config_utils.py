@@ -44,10 +44,14 @@ def interactive_setup():
     config[Config.VCS_TYPE_PROP_NAME] = click.prompt("  🔹 Version control system type (Gitlab)")
     config[Config.GIT_PROJECT_PROP_NAME] = click.prompt("  🔹 Git project name or namespace (e.g., user/repository or group/project)")
     config[Config.CURRENT_TICKET_PROP_NAME] = click.prompt("  🔹 Script to get the current issue (e.g., /scripts/get_current_issue.sh)")
-    config[Config.IN_PROGRESS_PROP_NAME] = click.prompt("  🔹 In-progress statuses (comma-separated, e.g., In Progress,Doing)").split(",")
+    config[Config.TO_DO_PROP_NAME] = click.prompt("  🔹 To-Do statuses (comma-separated, e.g., To do,Backlog)").split(",")
+    config[Config.TO_DO_PROP_NAME] = [status.strip() for status in config.get(Config.TO_DO_PROP_NAME)]
+    config[Config.IN_PROGRESS_PROP_NAME] = click.prompt("  🔹 In-Progress statuses (comma-separated, e.g., In Progress,Doing)").split(",")
     config[Config.IN_PROGRESS_PROP_NAME] = [status.strip() for status in config.get(Config.IN_PROGRESS_PROP_NAME)]
-    config[Config.IN_REVIEW_PROP_NAME] = click.prompt("  🔹 In-review statuses (comma-separated, e.g., In Review,Code Review)").split(",")
+    config[Config.IN_REVIEW_PROP_NAME] = click.prompt("  🔹 In-Review statuses (comma-separated, e.g., In Review,Code Review)").split(",")
     config[Config.IN_REVIEW_PROP_NAME] = [status.strip() for status in config.get(Config.IN_REVIEW_PROP_NAME)]
+    config[Config.DONE_PROP_NAME] = click.prompt("  🔹 Done statuses (comma-separated, e.g., Done,Complete)").split(",")
+    config[Config.DONE_PROP_NAME] = [status.strip() for status in config.get(Config.DONE_PROP_NAME)]
     config[Config.GIT_BRANCH_FIELD_PROP_NAME] = click.prompt("  🔹 Git branch metadata field in the Project management tool (e.g., customfield_12345)")
     config[Config.REVIEWER_FIELD_PROP_NAME] = click.prompt("  🔹 Reviewer metadata field in the Project management tool (e.g., customfield_12345)")
 
