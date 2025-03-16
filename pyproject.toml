@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gitask"
+version = "1.0.1"
+description = "A CLI tool to streamline your workflow by integrating with your PMT and VCS."
+readme = "README.md"
+requires-python = ">=3.6"
+license = {text = "MIT License"}
+authors = [
+    {name = "Shahaf Mordechay", email = ""}
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+homepage = "https://github.com/shahafMordechay/Gitask"
+repository = "https://github.com/shahafMordechay/Gitask"
+
+[project.dependencies]
+click = "*"            # Click library for CLI handling
+jira = "*"             # Jira Python client
+requests = "*"         # Requests library for HTTP requests
+python-gitlab = "*"    # Gitlab Python client
+
+[project.scripts]
+gitask = "gitask.main:cli"
