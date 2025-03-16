@@ -1,4 +1,0 @@
-jira
-click
-requests
-python-gitlab
