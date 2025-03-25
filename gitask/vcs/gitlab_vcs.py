@@ -46,6 +46,7 @@ class GitlabVcs(VCSInterface):
     def __init_gitlab_client(self):
         config = Config()
         self.gitlab_client = gitlab.Gitlab(config.git_url, private_token=config.git_token)
+        self.gitlab_client.auth()
         self.gitlab_project = self.gitlab_client.projects.get(config.git_proj)
 
 
@@ -56,6 +57,11 @@ class GitlabVcs(VCSInterface):
             return users[0].id
         else:
             raise ValueError(f"User with name '{name}' not found.")
+
+
+    @handle_gitlab_errors
+    def __get_current_user_id(self):
+        return self.gitlab_client.user.id
 
 
     @handle_gitlab_errors
@@ -73,7 +79,8 @@ class GitlabVcs(VCSInterface):
             'source_branch': source_branch,
             'target_branch': target_branch,
             'title': title,
-            'reviewer_ids': [self.__get_user_id_by_name(reviewer)]
+            'reviewer_ids': [self.__get_user_id_by_name(reviewer)],
+            'assignee_id': self.__get_current_user_id()
         }
 
         try:
