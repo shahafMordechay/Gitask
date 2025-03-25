@@ -98,38 +98,42 @@ This process will:
 
 ### Open a Ticket
 
-Moves the ticket to "To Do" status.
+&ensp; Moves the ticket to "To Do" status.
 
-`gitask open`
+&ensp; `gitask open`
+<br>
 
 ### Start Working on an Issue
 
-Moves it to "In Progress".
+&ensp; Moves it to "In Progress".
 
-`gitask start-working`
+&ensp; `gitask start-working`
+<br>
 
 ### Submit  for Review
 
-Moves it to "In Review".
+&ensp; Moves it to "In Review".
 
-Updates the issue’s “git branch” and “reviewer” fields.
+&ensp; Updates the issue’s “git branch” and “reviewer” fields.
 
-Creates a pull request.
+&ensp; Creates a pull request.
 
-`gitask submit-to-review`
+&ensp;  `gitask submit-to-review`
+<br>
 
 ### Mark Issue as Done
 
-Marks the issue as “Done".
+&ensp; Marks the issue as “Done".
 
-`gitask done`
+&ensp; `gitask done`
+<br>
 
 ### Interactive Configuration
 
-Guides you through setting up Gitask step by step.
+&ensp; Guides you through setting up Gitask step by step.
 
-`gitask configure`
-
+&ensp; `gitask configure`
+<br>
 
 ## Supported Integrations
 
@@ -158,6 +162,24 @@ BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
 ISSUE=$(echo "$BRANCH_NAME" | grep -o "COMPANY-[0-9]\{5\}")
 echo $ISSUE
 ```
+
+## Troubleshooting
+
+#### 1. ERROR: No matching distribution found for python-gitlab>=5.6.0
+   If you encounter this error, run the following command to install the required package:
+   ```bash
+   pip install --upgrade python-gitlab --index-url https://pypi.org/simple/
+   ```
+   If you’re working within a virtual environment, ensure that it is activated before running the above command.
+   <br>
+
+#### 2. Shell fails to recognize gitask command
+   If your shell does not recognize the gitask command after installation, it’s likely because the virtual environment’s bin directory is not in your PATH.<br>
+   To fix this, add the path to your virtual environment’s bin directory in your shell profile (e.g., .bashrc, .zshrc):
+   ```bash
+   export PATH="/path/to/your/virtualenv/bin:$PATH"
+   ```
+   After making this change, restart your terminal or run `source ~/.zshrc` (or equivalent) to apply the update.
 
 
 ## License

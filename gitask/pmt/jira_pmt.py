@@ -102,7 +102,7 @@ class JiraPmt(PMToolInterface):
         :return: The user object.
         """
         params = {"username": username}
-        users = self.__jira_get_request(params)
+        users = self.__jira_get_request("user/search", params)
         if not users:
             raise ValueError(f"User '{username}' not found")
 
@@ -129,14 +129,14 @@ class JiraPmt(PMToolInterface):
         """
         self.jira_client.issue(issue_key).update(fields={reviewer_field_id: user})
 
-    def __jira_get_request(self, params=None):
+    def __jira_get_request(self, resource, params=None):
         """
         Make a GET request to the JIRA API.
 
         :param params: The query parameters for the request.
         :return: The JSON response from the API.
         """
-        url = f"{self.api_url}/user/search"
+        url = f"{self.api_url}/{resource}"
         headers = {
             "Authorization": f"Bearer {self.token}",
             "Content-Type": "application/json"

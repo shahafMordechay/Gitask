@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gitask"
-version = "1.0.1"
+version = "1.0.2"
 description = "A CLI tool to streamline your workflow by integrating with your PMT and VCS."
 readme = "README.md"
 requires-python = ">=3.6"
@@ -23,10 +23,10 @@ homepage = "https://github.com/shahafMordechay/Gitask"
 repository = "https://github.com/shahafMordechay/Gitask"
 
 [project.dependencies]
-click = "*"            # Click library for CLI handling
-jira = "*"             # Jira Python client
-requests = "*"         # Requests library for HTTP requests
-python-gitlab = "*"    # Gitlab Python client
+click = "*"                 # Click library for CLI handling
+jira = "*"                  # Jira Python client
+requests = "*"              # Requests library for HTTP requests
+python-gitlab = ">=5.6.0"   # Gitlab Python client
 
 [project.scripts]
 gitask = "gitask.main:cli"
