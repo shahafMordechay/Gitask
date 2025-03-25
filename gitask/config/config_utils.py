@@ -100,7 +100,9 @@ def setup_autocomplete():
     with open(shell_config, "r+") as f:
         content = f.read()
         if autocomplete_command not in content:
-            f.write(f"\n{autocomplete_command}\n")
+            f.write("\nif command -v gitask >/dev/null 2>&1; then")
+            f.write(f"\n    {autocomplete_command}")
+            f.write("\nfi\n")
 
     click.echo("\n✅ Autocompletion enabled!")
 
