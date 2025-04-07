@@ -1,3 +1,5 @@
+import functools
+
 import click
 
 from gitask.config.config import Config
@@ -8,6 +10,26 @@ from gitask.utils import Utils
 from gitask.vcs.vcs_factory import get_vcs
 from gitask.vcs.version_control_tool import VCSInterface
 
+
+def with_hooks(action_name):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            utils = Utils()
+            config = Config()
+            hooks = config.hooks
+
+            if action_name in hooks and 'pre' in hooks[action_name]:
+                utils.run_hook_script(hooks[action_name]['pre'])
+
+            result = func(*args, **kwargs)
+
+            if action_name in hooks and 'post' in hooks[action_name]:
+                utils.run_hook_script(hooks[action_name]['post'])
+
+            return result
+        return wrapper
+    return decorator
 
 class Commands:
     """
@@ -38,6 +60,7 @@ class Commands:
 
         interactive_setup()
 
+    @with_hooks('open')
     def move_to_to_do(self):
         """Move the current ticket to To Do status."""
         # Step 1: Get current ticket
@@ -48,6 +71,7 @@ class Commands:
         self.pmt.update_ticket_status(issue_key, to_do_status)
         click.echo(f"'{to_do_status}' transition succeeded")
 
+    @with_hooks('start-working')
     def move_to_in_progress(self):
         """Move the current ticket to In Progress status."""
         # Step 1: Get current ticket
@@ -58,6 +82,7 @@ class Commands:
         self.pmt.update_ticket_status(issue_key, in_progress_status)
         click.echo(f"'{in_progress_status}' transition succeeded")
 
+    @with_hooks('submit-to-review')
     def move_to_in_review(self, title, reviewer, target_branch, pr_only_flag):
         """
         Move the current ticket to In Review status and create a pull request.
@@ -87,6 +112,7 @@ class Commands:
         pr_link = self.utils.create_pull_request(self.vcs, title, reviewer, target_branch=target_branch)
         click.echo(f"Successfully created merge request: {pr_link}")
 
+    @with_hooks('done')
     def move_to_done(self):
         """Move the current ticket to Done status."""
         # Step 1: Get current ticket

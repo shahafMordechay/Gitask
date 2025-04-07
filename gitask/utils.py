@@ -1,6 +1,7 @@
 import json
 import os
 import subprocess
+import sys
 
 from gitask.config.config import Config
 
@@ -60,3 +61,34 @@ class Utils:
             title = f"Merge {cur_branch} into {target_branch}"
 
         return vcs_object.create_pull_request(cur_branch, target_branch, title, reviewer)
+
+    def run_hook_script(self, script_path):
+        """
+        Executes the given script with Gitask config auth info.
+        Supports .py and .sh files.
+        """
+        if not script_path or not os.path.exists(script_path):
+            raise FileNotFoundError(f"Hook script not found: {script_path}")
+
+        issue_key = self.get_current_ticket()
+        args = [
+            f"--pmt-url={self.config.pmt_url}",
+            f"--pmt-token={self.config.pmt_token}",
+            f"--git-url={self.config.git_url}",
+            f"--git-token={self.config.git_token}",
+            f"--issue-key={issue_key}",
+        ]
+
+        if script_path.endswith(".py"):
+            cmd = [sys.executable, script_path] + args
+        elif script_path.endswith(".sh"):
+            cmd = ["bash", script_path] + args
+        else:
+            raise ValueError(f"Unsupported hook script type: {script_path}")
+
+        try:
+            subprocess.run(cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            raise ValueError(f"Hook script failed: {e}")
+        except PermissionError as e:
+            raise RuntimeError(f"Failed to execute hook script- permission denied: {e}")
