@@ -146,6 +146,84 @@ This process will:
 - GitLab
 
 
+## Gitask Hooks
+Gitask supports pre and post hooks for specific actions.<br>
+These hooks allow you to execute custom scripts before or after an action is performed. This can be useful for automating additional custom actions.<br>
+**Note:** The 'configure' command does not support hooks.
+
+Hooks are automatically executed by Gitask when the corresponding action is performed. If a hook script fails, the action will stop, and an error message will be displayed
+
+### Configuring Hooks
+Hooks can be configured in the Gitask configuration file. Each action can have a *pre* and/or *post* hook defined.
+
+Configuration example:
+```json
+{
+  "pmt-type": "jira",
+  "vcs-type": "gitlab",
+  ...,
+  "hooks": {
+    "open": {
+      "pre": "/path/to/pre_open_hook.sh",
+      "post": "/path/to/post_open_hook.py"
+    },
+    "submit-to-review": {
+      "pre": "/path/to/pre_submit_hook.sh",
+      "post": "/path/to/post_submit_hook.py"
+    }
+  }
+}
+```
+
+### Hook script
+The hook script can be either a python or a bash **executable** script.
+The arguments passed to the sscripts are:
+- --pmt-url: The project management tool URL.
+- --pmt-token: The authentication token for the project management tool.
+- --git-url: The Git repository URL.
+- --git-token: The authentication token for the Git repository.
+- --issue-key: The current issue key.
+
+### Examples:
+#### Python
+```python
+import argparse
+
+if __name__ == "__main__":
+   parser = argparse.ArgumentParser()
+   parser.add_argument("--pmt-url")
+   parser.add_argument("--pmt-token")
+   parser.add_argument("--git-url")
+   parser.add_argument("--git-token")
+   parser.add_argument("--phase")
+   parser.add_argument("--action")
+   
+   args = parser.parse_args()
+   
+   print(f"Running {args.phase} hook for action '{args.action}'")
+   print(f"PMT URL: {args.pmt_url}")
+   print(f"GIT URL: {args.git_url}")
+```
+#### Bash
+```bash
+#!/bin/bash
+for arg in "$@"; do
+  case $arg in
+    --pmt-url=*)
+      PMT_URL="${arg#*=}"
+      ;;
+    --pmt-token=*)
+      PMT_TOKEN="${arg#*=}"
+      ;;
+  esac
+done
+
+echo "Pre-hook for 'open' action triggered."
+echo "PMT URL: $PMT_URL"
+echo "Issue Key: $1"
+```
+
+
 ## Issue ID Extraction
 
 The current-ticket script should:
