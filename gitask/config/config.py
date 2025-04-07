@@ -19,6 +19,7 @@ class Config:
     REVIEWER_FIELD_PROP_NAME = "reviewer-field"
     GIT_BRANCH_FIELD_PROP_NAME = "git-branch-field"
     CURRENT_TICKET_PROP_NAME = "current-ticket"
+    HOOKS_PROP_NAME = "hooks"
 
 
     _instance = None
@@ -98,3 +99,7 @@ class Config:
     @property
     def current_ticket_script(self):
         return self.config_data.get(Config.CURRENT_TICKET_PROP_NAME)
+
+    @property
+    def hooks(self):
+        return self.config_data.get(Config.HOOKS_PROP_NAME)
