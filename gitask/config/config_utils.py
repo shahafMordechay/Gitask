@@ -55,6 +55,24 @@ def interactive_setup():
     config[Config.GIT_BRANCH_FIELD_PROP_NAME] = click.prompt("  🔹 Git branch metadata field in the Project management tool (e.g., customfield_12345)")
     config[Config.REVIEWER_FIELD_PROP_NAME] = click.prompt("  🔹 Reviewer metadata field in the Project management tool (e.g., customfield_12345)")
 
+    # Hooks configuration
+    click.echo("\n🔗 Configuring Gitask hooks:")
+    config["hooks"] = {}
+    gitask_commands = ["open", "start", "review", "done"]
+    
+    for command in gitask_commands:
+        config["hooks"][command] = {}
+        
+        # Pre-hook
+        pre_hook = click.prompt(f"  🔹 Pre-{command} script path (leave empty to skip)")
+        if pre_hook:
+            config["hooks"][command]["pre"] = os.path.expanduser(pre_hook)
+        
+        # Post-hook
+        post_hook = click.prompt(f"  🔹 Post-{command} script path (leave empty to skip)")
+        if post_hook:
+            config["hooks"][command]["post"] = os.path.expanduser(post_hook)
+
     # Save configuration and environment variables
     _set_env_variables(env_vars)
     save_json_to_file(config_file_path, config)

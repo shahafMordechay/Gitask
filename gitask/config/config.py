@@ -102,4 +102,4 @@ class Config:
 
     @property
     def hooks(self):
-        return self.config_data.get(Config.HOOKS_PROP_NAME)
+        return self.config_data.get(Config.HOOKS_PROP_NAME, {})
