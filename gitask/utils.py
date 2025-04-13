@@ -62,10 +62,15 @@ class Utils:
 
         return vcs_object.create_pull_request(cur_branch, target_branch, title, reviewer)
 
-    def run_hook_script(self, script_path):
+    def run_hook_script(self, script_path, command_params):
         """
         Executes the given script with Gitask config auth info.
         Supports .py and .sh files.
+        Note: Command parameters are only supported for Python hooks.
+
+        Args:
+            script_path (str): Path to the hook script
+            command_params (dict): Dictionary of command parameters to pass to the hook script.
         """
         if not script_path or not os.path.exists(script_path):
             raise FileNotFoundError(f"Hook script not found: {script_path}")
@@ -78,6 +83,11 @@ class Utils:
             f"--git-token={self.config.git_token}",
             f"--issue-key={issue_key}",
         ]
+
+        # Add command parameters for Python hooks
+        if command_params and script_path.endswith(".py"):
+            params_json = json.dumps(command_params)
+            args.append(f"--command-params={params_json}")
 
         if script_path.endswith(".py"):
             cmd = [sys.executable, script_path] + args
