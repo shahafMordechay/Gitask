@@ -17,7 +17,7 @@ def with_hooks(action_name):
         def wrapper(*args, **kwargs):
             utils = Utils()
             config = Config()
-            hooks = config.hooks
+            hooks = config.hooks or {}
 
             if action_name in hooks and 'pre' in hooks[action_name]:
                 utils.run_hook_script(hooks[action_name]['pre'])
