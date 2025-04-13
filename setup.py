@@ -15,6 +15,8 @@ setup(
         'jira',                     # Jira Python client
         'requests',                 # Requests library for HTTP requests
         'python-gitlab>=5.6.0',     # Gitlab Python client
+        'PyGithub>=2.1.1',          # GitHub Python client
+        'pyjwt[crypto]>=2.4.0',     # Required by PyGithub
     ],
     entry_points={
         'console_scripts': [

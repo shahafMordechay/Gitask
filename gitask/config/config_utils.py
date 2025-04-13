@@ -4,7 +4,7 @@ import sys
 import click
 
 from gitask.config.config import Config
-from gitask.utils import save_json_to_file
+from gitask.utils import save_json_to_file, split_and_strip
 
 GITASK_ENV_PATH = os.path.expanduser("~/.config/gitask/gitask_env")
 SHELL_CONFIG_FILES = {
@@ -40,18 +40,16 @@ def interactive_setup():
     # Config file setup
     click.echo("\n⚙️ Configuring Gitask settings:")
     config = {}
-    config[Config.PMT_TYPE_PROP_NAME] = click.prompt("  🔹 Project management tool type (Jira)")
-    config[Config.VCS_TYPE_PROP_NAME] = click.prompt("  🔹 Version control system type (Gitlab)")
+    config[Config.PMT_TYPE_PROP_NAME] = click.prompt("  🔹 Project management tool type (Jira, Github)", type=click.Choice(["Jira", "GitHub"], case_sensitive=False))
+    config[Config.VCS_TYPE_PROP_NAME] = click.prompt("  🔹 Version control system type (Gitlab, Github)", type=click.Choice(["Gitlab", "GitHub"], case_sensitive=False))
     config[Config.GIT_PROJECT_PROP_NAME] = click.prompt("  🔹 Git project name or namespace (e.g., user/repository or group/project)")
     config[Config.CURRENT_TICKET_PROP_NAME] = click.prompt("  🔹 Script to get the current issue (e.g., /scripts/get_current_issue.sh)")
-    config[Config.TO_DO_PROP_NAME] = click.prompt("  🔹 To-Do statuses (comma-separated, e.g., To do,Backlog)").split(",")
-    config[Config.TO_DO_PROP_NAME] = [status.strip() for status in config.get(Config.TO_DO_PROP_NAME)]
-    config[Config.IN_PROGRESS_PROP_NAME] = click.prompt("  🔹 In-Progress statuses (comma-separated, e.g., In Progress,Doing)").split(",")
-    config[Config.IN_PROGRESS_PROP_NAME] = [status.strip() for status in config.get(Config.IN_PROGRESS_PROP_NAME)]
-    config[Config.IN_REVIEW_PROP_NAME] = click.prompt("  🔹 In-Review statuses (comma-separated, e.g., In Review,Code Review)").split(",")
-    config[Config.IN_REVIEW_PROP_NAME] = [status.strip() for status in config.get(Config.IN_REVIEW_PROP_NAME)]
-    config[Config.DONE_PROP_NAME] = click.prompt("  🔹 Done statuses (comma-separated, e.g., Done,Complete)").split(",")
-    config[Config.DONE_PROP_NAME] = [status.strip() for status in config.get(Config.DONE_PROP_NAME)]
+
+    config[Config.TO_DO_PROP_NAME] = split_and_strip(click.prompt("  🔹 To-Do statuses (comma-separated, e.g., To do,Backlog)"))
+    config[Config.IN_PROGRESS_PROP_NAME] = split_and_strip(click.prompt("  🔹 In-Progress statuses (comma-separated, e.g., In Progress,Doing)"))
+    config[Config.IN_REVIEW_PROP_NAME] = split_and_strip(click.prompt("  🔹 In-Review statuses (comma-separated, e.g., In Review,Code Review)"))
+    config[Config.DONE_PROP_NAME] = split_and_strip(click.prompt("  🔹 Done statuses (comma-separated, e.g., Done,Complete)"))
+    
     config[Config.GIT_BRANCH_FIELD_PROP_NAME] = click.prompt("  🔹 Git branch metadata field in the Project management tool (e.g., customfield_12345)")
     config[Config.REVIEWER_FIELD_PROP_NAME] = click.prompt("  🔹 Reviewer metadata field in the Project management tool (e.g., customfield_12345)")
 
@@ -81,7 +79,7 @@ def interactive_setup():
     # Autocompletion setup
     setup_autocomplete()
 
-    shell_config = os.path.expanduser(SHELL_CONFIG_FILES[get_shell_type()])
+    shell_config = os.path.expanduser(SHELL_CONFIG_FILES[_get_shell_type()])
     click.secho("\n🎯 Setup complete!", fg="green", bold=True)
     click.secho("\n❗ IMPORTANT: To start using Gitask, restart your terminal or run:", fg="yellow", bold=True)
     click.secho(f"   source {shell_config}\n", fg="yellow", bold=True)
@@ -99,7 +97,7 @@ def setup_autocomplete():
         "fish": '_GITASK_COMPLETE=fish_source gitask | source',
     }
 
-    shell = get_shell_type()
+    shell = _get_shell_type()
     autocomplete_command = autocomplete_command_by_shell[shell]
 
     click.echo("\n🔹 Gitask CLI supports autocompletion!")
@@ -135,14 +133,14 @@ def _set_env_variables(env_vars):
             f.write(f'export {key}="{value.strip()}"\n')
 
     # Ensure the file is sourced in .bashrc/.zshrc/.profile
-    shell = get_shell_type()
+    shell = _get_shell_type()
     shell_path = os.path.expanduser(SHELL_CONFIG_FILES[shell])
     with open(shell_path, "r+") as f:
         content = f.read()
         if f"source {env_file_path}" not in content:
             f.write(f'\n# Load Gitask environment variables\nsource {env_file_path}\n')
 
-def get_shell_type():
+def _get_shell_type():
     shell = os.getenv("SHELL", "")
 
     if "bash" in shell:

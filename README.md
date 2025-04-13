@@ -73,8 +73,8 @@ The configuration file is a JSON file that specifies the integration details for
 
 | **Field**          | **Description**                                                                                                                       |
 |--------------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| `pmt-type`         | Specifies the project management tool being used (e.g., "Jira", "Clickup", "Trello")                                                  |
-| `vcs-type`         | Specifies the version control system being used (e.g., "GitLab", "GitHub", "Bitbucket")                                               |
+| `pmt-type`         | Specifies the project management tool being used (e.g., "Jira", "GitHub", "Clickup", "Trello")                                                             |
+| `vcs-type`         | Specifies the version control system being used (e.g., "GitLab", "GitHub", "Bitbucket")                                                            |
 | `git-project`      | The path to the project in your VCS (e.g., "group/project" in GitLab or "owner/repo" in GitHub)                                       |
 | `current-ticket`   | Path to the script that extracts the current issue ID from your working environment (see [Issue ID Extraction](#issue-iD-extraction)) |
 | `to-do`            | An array of status transition names that lead to your corresponding “To Do” status                                                    |
@@ -114,7 +114,7 @@ This process will:
 
 &ensp; Moves it to "In Review".
 
-&ensp; Updates the issue’s “git branch” and “reviewer” fields.
+&ensp; Updates the issue's "git branch" and "reviewer" fields.
 
 &ensp; Creates a pull request.
 
@@ -123,7 +123,7 @@ This process will:
 
 ### Mark Issue as Done
 
-&ensp; Marks the issue as “Done".
+&ensp; Marks the issue as "Done".
 
 &ensp; `gitask done`
 <br>
@@ -140,10 +140,12 @@ This process will:
 ### Project Management Tools
 
 - Jira
+- GitHub Issues
 
 ### Version Control Systems
 
 - GitLab
+- GitHub
 
 
 ## Gitask Hooks
@@ -248,12 +250,12 @@ echo $ISSUE
    ```bash
    pip install --upgrade python-gitlab --index-url https://pypi.org/simple/
    ```
-   If you’re working within a virtual environment, ensure that it is activated before running the above command.
+   If you're working within a virtual environment, ensure that it is activated before running the above command.
    <br>
 
 #### 2. Shell fails to recognize gitask command
-   If your shell does not recognize the gitask command after installation, it’s likely because the virtual environment’s bin directory is not in your PATH.<br>
-   To fix this, add the path to your virtual environment’s bin directory in your shell profile (e.g., .bashrc, .zshrc):
+   If your shell does not recognize the gitask command after installation, it's likely because the virtual environment's bin directory is not in your PATH.<br>
+   To fix this, add the path to your virtual environment's bin directory in your shell profile (e.g., .bashrc, .zshrc):
    ```bash
    export PATH="/path/to/your/virtualenv/bin:$PATH"
    ```
