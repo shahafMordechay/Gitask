@@ -19,13 +19,20 @@ def with_hooks(action_name):
             config = Config()
             hooks = config.hooks
 
+            # Pass the command parameters (args and kwargs) to the hook scripts
+            command_params = {}
+            if args:
+                command_params['args'] = list(args)
+            if kwargs:
+                command_params.update(kwargs)
+
             if action_name in hooks and 'pre' in hooks[action_name]:
-                utils.run_hook_script(hooks[action_name]['pre'])
+                utils.run_hook_script(hooks[action_name]['pre'], command_params)
 
             result = func(*args, **kwargs)
 
             if action_name in hooks and 'post' in hooks[action_name]:
-                utils.run_hook_script(hooks[action_name]['post'])
+                utils.run_hook_script(hooks[action_name]['post'], command_params)
 
             return result
         return wrapper
