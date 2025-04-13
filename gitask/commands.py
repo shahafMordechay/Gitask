@@ -109,8 +109,7 @@ class Commands:
             click.echo(f"'{in_review_status}' transition succeeded.")
 
         # Step 5: Create MR
-        pr_link = self.utils.create_pull_request(self.vcs, title, reviewer, target_branch=target_branch)
-        click.echo(f"Successfully created merge request: {pr_link}")
+        self.utils.create_pull_request(self.vcs, title, reviewer, target_branch=target_branch)
 
     @with_hooks('done')
     def move_to_done(self):

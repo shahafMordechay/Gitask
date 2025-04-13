@@ -3,6 +3,8 @@ import os
 import subprocess
 import sys
 
+import click
+
 from gitask.config.config import Config
 
 
@@ -60,7 +62,9 @@ class Utils:
         if title == "":
             title = f"Merge {cur_branch} into {target_branch}"
 
-        return vcs_object.create_pull_request(cur_branch, target_branch, title, reviewer)
+        pr_link = vcs_object.create_pull_request(cur_branch, target_branch, title, reviewer)
+        click.echo(f"Successfully created pull request: {pr_link}")
+        return pr_link
 
     def run_hook_script(self, script_path):
         """
@@ -92,3 +96,6 @@ class Utils:
             raise ValueError(f"Hook script failed: {e}")
         except PermissionError as e:
             raise RuntimeError(f"Failed to execute hook script- permission denied: {e}")
+
+def split_and_strip(value: str, sep: str = ",") -> list[str]:
+    return [s.strip() for s in value.split(sep)]
