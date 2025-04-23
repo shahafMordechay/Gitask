@@ -46,12 +46,12 @@ def interactive_setup():
     config[Config.CURRENT_TICKET_PROP_NAME] = click.prompt("  🔹 Script to get the current issue (e.g., /scripts/get_current_issue.sh)")
 
     config[Config.TO_DO_PROP_NAME] = split_and_strip(click.prompt("  🔹 To-Do statuses (comma-separated, e.g., To do,Backlog)"))
-    config[Config.IN_PROGRESS_PROP_NAME] = split_and_strip(click.prompt("  🔹 In-Progress statuses (comma-separated, e.g., In Progress,Doing)"))
-    config[Config.IN_REVIEW_PROP_NAME] = split_and_strip(click.prompt("  🔹 In-Review statuses (comma-separated, e.g., In Review,Code Review)"))
+    config[Config.IN_PROGRESS_PROP_NAME] = split_and_strip(click.prompt("  🔹 In-Progress statuses (comma-separated, e.g., In Progress,Doing) (Optional)", default="", show_default=False))
+    config[Config.IN_REVIEW_PROP_NAME] = split_and_strip(click.prompt("  🔹 In-Review statuses (comma-separated, e.g., In Review,Code Review) (Optional)", default="", show_default=False))
     config[Config.DONE_PROP_NAME] = split_and_strip(click.prompt("  🔹 Done statuses (comma-separated, e.g., Done,Complete)"))
     
-    config[Config.GIT_BRANCH_FIELD_PROP_NAME] = click.prompt("  🔹 Git branch metadata field in the Project management tool (e.g., customfield_12345)")
-    config[Config.REVIEWER_FIELD_PROP_NAME] = click.prompt("  🔹 Reviewer metadata field in the Project management tool (e.g., customfield_12345)")
+    config[Config.GIT_BRANCH_FIELD_PROP_NAME] = click.prompt("  🔹 Git branch metadata field in the Project management tool (e.g., customfield_12345) (Optional)", default="", show_default=False)
+    config[Config.REVIEWER_FIELD_PROP_NAME] = click.prompt("  🔹 Reviewer metadata field in the Project management tool (e.g., customfield_12345) (Optional)", default="", show_default=False)
 
     # Hooks configuration
     click.echo("\n🔗 Configuring Gitask hooks:")
