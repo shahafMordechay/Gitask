@@ -77,12 +77,12 @@ The configuration file is a JSON file that specifies the integration details for
 | `vcs-type`         | Specifies the version control system being used (e.g., "GitLab", "GitHub", "Bitbucket")                                               |
 | `git-project`      | The path to the project in your VCS (e.g., "group/project" in GitLab or "owner/repo" in GitHub)                                       |
 | `current-ticket`   | Path to the script that extracts the current issue ID from your working environment (see [Issue ID Extraction](#issue-iD-extraction)) |
-| `to-do`            | An array of status transition names that lead to your corresponding “To Do” status                                                    |
-| `in-progress`      | An array of status transition names that lead to your corresponding “In Progress” status                                              |
-| `in-review`        | An array of status transition names that lead to your corresponding “In Review” status                                                |
-| `done`             | An array of status transition names that lead to your corresponding “Done” status                                                     |
-| `git-branch-field` | The custom issue field ID for storing the git branch name in your PMT (required only if it’s a custom field)                          |
-| `reviewer-field`   | The custom issue field ID for storing the reviewer username in your PMT (required only if it’s a custom field)                        |
+| `to-do`            | An array of status transition names that lead to your corresponding "To Do" status                                                    |
+| `in-progress`      | An array of status transition names that lead to your corresponding "In Progress" status                                              |
+| `in-review`        | An array of status transition names that lead to your corresponding "In Review" status                                                |
+| `done`             | An array of status transition names that lead to your corresponding "Done" status                                                     |
+| `git-branch-field` | The custom issue field ID for storing the git branch name in your PMT (required only if it's a custom field)                          |
+| `reviewer-field`   | The custom issue field ID for storing the reviewer username in your PMT (required only if it's a custom field)                        |
 
 ### Interactive Setup
 For a guided configuration experience, use the built-in interactive setup: `gitask configure`.
@@ -114,7 +114,7 @@ This process will:
 
 &ensp; Moves it to "In Review".
 
-&ensp; Updates the issue’s “git branch” and “reviewer” fields.
+&ensp; Updates the issue's "git branch" and "reviewer" fields.
 
 &ensp; Creates a pull request.
 
@@ -123,7 +123,7 @@ This process will:
 
 ### Mark Issue as Done
 
-&ensp; Marks the issue as “Done".
+&ensp; Marks the issue as "Done".
 
 &ensp; `gitask done`
 <br>
@@ -149,9 +149,8 @@ This process will:
 ## Gitask Hooks
 Gitask supports pre and post hooks for specific actions.<br>
 These hooks allow you to execute custom scripts before or after an action is performed. This can be useful for automating additional custom actions.<br>
-**Note:** The 'configure' command does not support hooks.
 
-Hooks are automatically executed by Gitask when the corresponding action is performed. If a hook script fails, the action will stop, and an error message will be displayed
+Hooks are automatically executed by Gitask when the corresponding action is performed. If a hook script fails, the action will stop, and an error message will be displayed.
 
 ### Configuring Hooks
 Hooks can be configured in the Gitask configuration file. Each action can have a *pre* and/or *post* hook defined.
@@ -177,17 +176,19 @@ Configuration example:
 
 ### Hook script
 The hook script can be either a python or a bash **executable** script.
-The arguments passed to the sscripts are:
-- --pmt-url: The project management tool URL.
-- --pmt-token: The authentication token for the project management tool.
-- --git-url: The Git repository URL.
-- --git-token: The authentication token for the Git repository.
-- --issue-key: The current issue key.
+The arguments passed to the scripts are:
+- `--pmt-url`: The project management tool URL
+- `--pmt-token`: The authentication token for the project management tool
+- `--git-url`: The Git repository URL
+- `--git-token`: The authentication token for the Git repository
+- `--issue-key`: The current issue key
+- `--command-params`: JSON string containing command parameters **(Python hooks only)**
 
 ### Examples:
 #### Python
 ```python
 import argparse
+import json
 
 if __name__ == "__main__":
    parser = argparse.ArgumentParser()
@@ -195,15 +196,22 @@ if __name__ == "__main__":
    parser.add_argument("--pmt-token")
    parser.add_argument("--git-url")
    parser.add_argument("--git-token")
-   parser.add_argument("--phase")
-   parser.add_argument("--action")
+   parser.add_argument("--issue-key")
+   parser.add_argument("--command-params")
    
    args = parser.parse_args()
    
-   print(f"Running {args.phase} hook for action '{args.action}'")
+   # Parse command parameters if provided
+   command_params = {}
+   if args.command_params:
+       command_params = json.loads(args.command_params)
+   
+   print(f"Running hook for issue: {args.issue_key}")
    print(f"PMT URL: {args.pmt_url}")
    print(f"GIT URL: {args.git_url}")
+   print(f"Command parameters: {command_params}")
 ```
+
 #### Bash
 ```bash
 #!/bin/bash
@@ -248,16 +256,25 @@ echo $ISSUE
    ```bash
    pip install --upgrade python-gitlab --index-url https://pypi.org/simple/
    ```
-   If you’re working within a virtual environment, ensure that it is activated before running the above command.
+   If you're working within a virtual environment, ensure that it is activated before running the above command.
    <br>
 
 #### 2. Shell fails to recognize gitask command
-   If your shell does not recognize the gitask command after installation, it’s likely because the virtual environment’s bin directory is not in your PATH.<br>
-   To fix this, add the path to your virtual environment’s bin directory in your shell profile (e.g., .bashrc, .zshrc):
+   If your shell does not recognize the gitask command after installation, it's likely because the virtual environment's bin directory is not in your PATH.<br>
+   To fix this, add the path to your virtual environment's bin directory in your shell profile (e.g., .bashrc, .zshrc):
    ```bash
    export PATH="/path/to/your/virtualenv/bin:$PATH"
    ```
    After making this change, restart your terminal or run `source ~/.zshrc` (or equivalent) to apply the update.
+   <br>
+
+#### 3. macOS OpenSSL and urllib3 Issues
+   If you encounter SSL-related errors on macOS, particularly with urllib3, you can resolve this by installing urllib3 version lower than 2:
+   ```bash
+   pip install 'urllib3<2.0'
+   ```
+   This is a known issue with macOS and OpenSSL compatibility. The downgrade to urllib3 provides better compatibility with macOS's OpenSSL implementation.
+   <br>
 
 
 ## License
@@ -268,10 +285,14 @@ This project is licensed under the MIT License - see the [LICENSE file](https://
 ## Contributing
 
 Contributions are welcome! Feel free to submit pull requests or open issues.
+
 1. Fork the repository 
-2. Create your feature branch (`git checkout -b username/amazing-feature`)
+2. Create your feature branch following the naming convention:<br>
+   `git checkout -b username/feature/issue_number-branch-description`
+   <br>or<br>
+   `git checkout -b username/bug/issue_number-branch-description`
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin username/amazing-feature`)
+4. Push to the branch (`git push origin username/feature/issue_number-branch-description`)
 5. Open a Pull Request
 
 
