@@ -1,0 +1,106 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'CHANGELOG.md'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: github.event.head_commit.message == 'Updated CHANGELOG.md'
+    
+    steps:
+      - name: Checkout code with full history
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}  # Use token with write permissions
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install bumpversion
+          pip install poetry
+          pip install twine
+
+      - name: Get current version
+        id: get_version
+        run: |
+          CURRENT_VERSION=$(poetry version | cut -d' ' -f2)
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Bump version
+        id: bump
+        run: |
+          bumpversion minor --no-tag --no-commit
+          NEW_VERSION=$(poetry version | cut -d' ' -f2)
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Merge develop to main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CURRENT_VERSION: ${{ steps.get_version.outputs.CURRENT_VERSION }}
+          NEW_VERSION: ${{ steps.bump.outputs.NEW_VERSION }}
+        run: |
+          git checkout main
+          git merge develop --no-ff -m "Release $NEW_VERSION version"
+          git push origin main
+
+      - name: Create and push tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_VERSION: ${{ steps.bump.outputs.NEW_VERSION }}
+        run: |
+          git tag v${NEW_VERSION}
+          git push origin v${NEW_VERSION}
+
+      - name: Build and publish to PyPI
+        id: pypi_publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          repository_url: https://upload.pypi.org/legacy/
+        env:
+          NEW_VERSION: ${{ steps.bump.outputs.NEW_VERSION }}
+
+      - name: Create GitHub Release
+        if: steps.pypi_publish.outcome == 'success'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.bump.outputs.NEW_VERSION }}
+          name: "Release v${{ steps.bump.outputs.NEW_VERSION }}"
+          body: |
+            Release notes will be automatically generated
+            from the commits between versions.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cleanup on failure
+        if: steps.pypi_publish.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CURRENT_VERSION: ${{ steps.get_version.outputs.CURRENT_VERSION }}
+          NEW_VERSION: ${{ steps.bump.outputs.NEW_VERSION }}
+        run: |
+          # Revert merge
+          git checkout main
+          git reset --hard HEAD~1
+          git push -f origin main
+          
+          # Remove tag
+          git tag -d v${NEW_VERSION}
+          git push origin :refs/tags/v${NEW_VERSION}
+          
+          # Revert version bump
+          git checkout develop
+          git reset --hard HEAD~1
+          git push -f origin develop
