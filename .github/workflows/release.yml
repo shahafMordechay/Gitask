@@ -1,6 +1,7 @@
 name: Release
 
 on:
+  workflow_dispatch:  # Manual trigger
   push:
     branches:
       - develop
@@ -61,17 +62,16 @@ jobs:
           git tag v${NEW_VERSION}
           git push origin v${NEW_VERSION}
 
-      - name: Build and publish to PyPI
-        id: pypi_publish
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          repository_url: https://upload.pypi.org/legacy/
-        env:
-          NEW_VERSION: ${{ steps.bump.outputs.NEW_VERSION }}
+#      - name: Build and publish to PyPI
+#        id: pypi_publish
+#        uses: pypa/gh-action-pypi-publish@release/v1
+#        with:
+#          password: ${{ secrets.PYPI_API_TOKEN }}
+#          repository_url: https://upload.pypi.org/legacy/
+#        env:
+#          NEW_VERSION: ${{ steps.bump.outputs.NEW_VERSION }}
 
       - name: Create GitHub Release
-        if: steps.pypi_publish.outcome == 'success'
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ steps.bump.outputs.NEW_VERSION }}
@@ -84,23 +84,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Cleanup on failure
-        if: steps.pypi_publish.outcome == 'failure'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CURRENT_VERSION: ${{ steps.get_version.outputs.CURRENT_VERSION }}
-          NEW_VERSION: ${{ steps.bump.outputs.NEW_VERSION }}
-        run: |
-          # Revert merge
-          git checkout main
-          git reset --hard HEAD~1
-          git push -f origin main
-          
-          # Remove tag
-          git tag -d v${NEW_VERSION}
-          git push origin :refs/tags/v${NEW_VERSION}
-          
-          # Revert version bump
-          git checkout develop
-          git reset --hard HEAD~1
-          git push -f origin develop
+#      - name: Cleanup on failure
+#        if: steps.pypi_publish.outcome == 'failure'
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          CURRENT_VERSION: ${{ steps.get_version.outputs.CURRENT_VERSION }}
+#          NEW_VERSION: ${{ steps.bump.outputs.NEW_VERSION }}
+#        run: |
+#          # Revert merge
+#          git checkout main
+#          git reset --hard HEAD~1
+#          git push -f origin main
+#          
+#          # Remove tag
+#          git tag -d v${NEW_VERSION}
+#          git push origin :refs/tags/v${NEW_VERSION}
+#          
+#          # Revert version bump
+#          git checkout develop
+#          git reset --hard HEAD~1
+#          git push -f origin develop
