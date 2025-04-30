@@ -1,0 +1,69 @@
+name: Create Minor Release
+
+on:
+  workflow_dispatch:  # Manual trigger only
+    inputs:
+      skip_publish:
+        description: 'Skip building and publishing to PyPI'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --local user.name "${{ github.actor }}"
+          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install poetry
+          pip install twine
+
+      - name: Check commit and bump version
+        id: version
+        env:
+          GITHUB_OUTPUT: ${{ github.output }}
+        run: .github/scripts/check_and_bump.sh
+
+      - name: Build and publish to PyPI
+        if: success() && !inputs.skip_publish
+        env:
+          PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        run: .github/scripts/build_and_publish.sh
+
+      - name: Merge and create release
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          NEW_VERSION: ${{ steps.version.outputs.NEW_VERSION }}
+        run: .github/scripts/merge_and_release.sh
+
+      - name: Create GitHub Release
+        if: success()
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.NEW_VERSION }}
+          name: "Release v${{ steps.version.outputs.NEW_VERSION }}"
+          body: |
+            Release notes will be automatically generated
+            from the commits between versions.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }} 
