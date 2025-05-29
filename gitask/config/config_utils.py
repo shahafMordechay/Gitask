@@ -28,6 +28,11 @@ def interactive_setup():
     # Config file path
     config_file_path = click.prompt("📂 Enter the config file path", default=Config.DEFAULT_CONFIG_FILE)
     config_file_path = os.path.expanduser(config_file_path)
+    
+    # Ensure the directory exists
+    os.makedirs(os.path.dirname(config_file_path), exist_ok=True)
+    
+    # Set the config file path in environment variables
     env_vars[Config.CONFIG_FILE] = config_file_path
 
     # Environment variables
@@ -42,13 +47,13 @@ def interactive_setup():
     config = {}
     config[Config.PMT_TYPE_PROP_NAME] = click.prompt("  🔹 Project management tool type (Jira, Github)", type=click.Choice(["Jira", "GitHub"], case_sensitive=False))
     config[Config.VCS_TYPE_PROP_NAME] = click.prompt("  🔹 Version control system type (Gitlab, Github)", type=click.Choice(["Gitlab", "GitHub"], case_sensitive=False))
-    config[Config.GIT_PROJECT_PROP_NAME] = click.prompt("  🔹 Git project name or namespace (e.g., user/repository or group/project)")
-    config[Config.CURRENT_TICKET_PROP_NAME] = click.prompt("  🔹 Script to get the current issue (e.g., /scripts/get_current_issue.sh)")
+    config[Config.GIT_PROJECT_PROP_NAME] = click.prompt("  🔹 Git project name or namespace (e.g., user/repository or group/project)", default=None)
+    config[Config.CURRENT_TICKET_PROP_NAME] = click.prompt("  🔹 Script to get the current issue (e.g., /scripts/get_current_issue.sh)", default=None)
 
-    config[Config.TO_DO_PROP_NAME] = split_and_strip(click.prompt("  🔹 To-Do statuses (comma-separated, e.g., To do,Backlog)"))
+    config[Config.TO_DO_PROP_NAME] = split_and_strip(click.prompt("  🔹 To-Do statuses (comma-separated, e.g., To do,Backlog)", default=None))
     config[Config.IN_PROGRESS_PROP_NAME] = split_and_strip(click.prompt("  🔹 In-Progress statuses (comma-separated, e.g., In Progress,Doing) (Optional)", default="", show_default=False))
     config[Config.IN_REVIEW_PROP_NAME] = split_and_strip(click.prompt("  🔹 In-Review statuses (comma-separated, e.g., In Review,Code Review) (Optional)", default="", show_default=False))
-    config[Config.DONE_PROP_NAME] = split_and_strip(click.prompt("  🔹 Done statuses (comma-separated, e.g., Done,Complete)"))
+    config[Config.DONE_PROP_NAME] = split_and_strip(click.prompt("  🔹 Done statuses (comma-separated, e.g., Done,Complete)", default=None))
     
     config[Config.GIT_BRANCH_FIELD_PROP_NAME] = click.prompt("  🔹 Git branch metadata field in the Project management tool (e.g., customfield_12345) (Optional)", default="", show_default=False)
     config[Config.REVIEWER_FIELD_PROP_NAME] = click.prompt("  🔹 Reviewer metadata field in the Project management tool (e.g., customfield_12345) (Optional)", default="", show_default=False)
@@ -71,10 +76,13 @@ def interactive_setup():
         if post_hook:
             config["hooks"][command]["post"] = os.path.expanduser(post_hook)
 
-    # Save configuration and environment variables
-    _set_env_variables(env_vars)
+    # Save the config file
     save_json_to_file(config_file_path, config)
     click.echo("\n✅ Configuration saved!")
+
+    # Set environment variables
+    _set_env_variables(env_vars)
+    click.echo("\n✅ Environment variables set!")
 
     # Autocompletion setup
     setup_autocomplete()

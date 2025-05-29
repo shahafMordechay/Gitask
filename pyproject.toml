@@ -34,3 +34,9 @@ repository = "https://github.com/shahafMordechay/Gitask"
 
 [project.scripts]
 gitask = "gitask.main:cli"
+
+[tool.pytest.ini_options]
+addopts = "-ra -q"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0.0"

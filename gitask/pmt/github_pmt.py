@@ -23,11 +23,11 @@ class GitHubPmt(PMToolInterface):
 
     def update_git_branch(self, issue_key: str, git_branch_field: str) -> None:
         """Not supported for GitHub."""
-        raise NotImplementedError("This action is not supported for GitHub")
+        return
 
     def update_reviewer(self, issue_key: str, reviewer_field: str, user: dict) -> None:
         """Not supported for GitHub."""
-        raise NotImplementedError("This action is not supported for GitHub")
+        return
 
     def find_valid_status_transition(self, issue_key: str, target_statuses: List[str]) -> str:
         """Find a valid status transition based on current issue state."""

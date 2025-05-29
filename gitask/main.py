@@ -20,6 +20,7 @@ def handle_exceptions(func):
                 raise
             else:
                 click.echo(f"Error: {type(e).__name__}: {e}", err=True)
+                sys.exit(1)
     return wrapper
 
 

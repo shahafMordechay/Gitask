@@ -21,6 +21,14 @@ class Config:
     CURRENT_TICKET_PROP_NAME = "current-ticket"
     HOOKS_PROP_NAME = "hooks"
 
+    REQUIRED_FIELDS = [
+        PMT_TYPE_PROP_NAME,
+        VCS_TYPE_PROP_NAME,
+        GIT_PROJECT_PROP_NAME,
+        CURRENT_TICKET_PROP_NAME,
+        TO_DO_PROP_NAME,
+        DONE_PROP_NAME
+    ]
 
     _instance = None
 
@@ -37,12 +45,22 @@ class Config:
         try:
             with open(config_path, 'r') as config_file:
                 self.config_data = json.load(config_file)
+                self._validate_required_fields()
         except FileNotFoundError:
-            print(f"Error: Configuration file not found at {config_path}")
-            self.config_data = {}  # Set to an empty dict to avoid attribute errors
+            raise FileNotFoundError(f"Configuration file not found at {config_path}")
         except json.JSONDecodeError:
-            print("Error: Configuration file is not a valid JSON.")
-            self.config_data = {}
+            raise ValueError(f"Failed to parse config file {config_path}.")
+
+    def _validate_required_fields(self):
+        """Validate that all required fields are present and non-empty."""
+        missing_fields = []
+        for field in self.REQUIRED_FIELDS:
+            value = self.config_data.get(field)
+            if not value:
+                missing_fields.append(field)
+        
+        if missing_fields:
+            raise ValueError(f"Missing required fields: {', '.join(missing_fields)}")
 
     @property
     def pmt_token(self):

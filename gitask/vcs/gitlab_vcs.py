@@ -19,13 +19,11 @@ def handle_gitlab_errors(func):
         try:
             return func(*args, **kwargs)
         except gitlab.exceptions.GitlabError as e:
-            error_message = e.error_message
-            if len(error_message) == 1:
+            error_message = getattr(e, 'error_message', str(e))
+            if isinstance(error_message, list) and len(error_message) == 1:
                 error_message = error_message[0]
-
             click.echo(error_message)
             sys.exit(1)
-
     return wrapper
 
 
