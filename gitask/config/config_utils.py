@@ -28,6 +28,11 @@ def interactive_setup():
     # Config file path
     config_file_path = click.prompt("📂 Enter the config file path", default=Config.DEFAULT_CONFIG_FILE)
     config_file_path = os.path.expanduser(config_file_path)
+    
+    # Ensure the directory exists
+    os.makedirs(os.path.dirname(config_file_path), exist_ok=True)
+    
+    # Set the config file path in environment variables
     env_vars[Config.CONFIG_FILE] = config_file_path
 
     # Environment variables
@@ -71,10 +76,13 @@ def interactive_setup():
         if post_hook:
             config["hooks"][command]["post"] = os.path.expanduser(post_hook)
 
-    # Save configuration and environment variables
-    _set_env_variables(env_vars)
+    # Save the config file
     save_json_to_file(config_file_path, config)
     click.echo("\n✅ Configuration saved!")
+
+    # Set environment variables
+    _set_env_variables(env_vars)
+    click.echo("\n✅ Environment variables set!")
 
     # Autocompletion setup
     setup_autocomplete()

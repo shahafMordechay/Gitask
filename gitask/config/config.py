@@ -41,7 +41,7 @@ class Config:
             print(f"Error: Configuration file not found at {config_path}")
             self.config_data = {}  # Set to an empty dict to avoid attribute errors
         except json.JSONDecodeError:
-            print("Error: Configuration file is not a valid JSON.")
+            print(f"Error: Failed to parse config file {config_path}.")
             self.config_data = {}
 
     @property

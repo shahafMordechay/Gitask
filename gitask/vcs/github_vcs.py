@@ -18,7 +18,16 @@ def handle_github_errors(func):
         try:
             return func(*args, **kwargs)
         except GithubException as e:
-            click.echo(f"GitHub Error: {e.data.get('message', str(e))}")
+            # e.data can be a dict or a string (when mocked)
+            message = None
+            if hasattr(e, 'data'):
+                if isinstance(e.data, dict):
+                    message = e.data.get('message', str(e))
+                else:
+                    message = str(e.data)
+            else:
+                message = str(e)
+            click.echo(f"GitHub Error: {message}")
             sys.exit(1)
 
     return wrapper
@@ -51,13 +60,13 @@ class GithubVcs(VCSInterface):
         :return: The GitHub user object
         :raises: ValueError if no user found
         """
-        # First try exact username match
         try:
             user = self.github_client.get_user(name)
             return user
-        except GithubException.UnknownObjectException:
-            raise ValueError(f"No GitHub user found matching '{name}'")
-        except GithubException:
+        except GithubException as e:
+            # 404 means not found, others are generic errors
+            if hasattr(e, 'status') and e.status == 404:
+                raise ValueError(f"No GitHub user found matching '{name}'")
             raise ValueError(f"Failed to get user by name: {name}")
 
     @handle_github_errors
