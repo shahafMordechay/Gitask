@@ -1,21 +1,25 @@
 import functools
 import subprocess
-
 import click
+import os
+import sys
 
 from gitask.commands import Commands
 
 
 def handle_exceptions(func):
-    """Decorator to handle exceptions and print user-friendly error messages."""
-    @functools.wraps(func) # To preserve Click's metadata
+    """Decorator to handle exceptions and print user-friendly error messages, or re-raise if debug is set."""
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):
+        ctx = click.get_current_context(silent=True)
+        debug = ctx and ctx.obj and ctx.obj.get('DEBUG', False)
         try:
             return func(*args, **kwargs)
-        except subprocess.CalledProcessError as e:
-            click.echo(f"Subprocess Error: {str(e)}", err=True)
         except Exception as e:
-            click.echo(str(e), err=True)
+            if debug:
+                raise
+            else:
+                click.echo(f"Error: {type(e).__name__}: {e}", err=True)
     return wrapper
 
 
@@ -60,9 +64,11 @@ def done():
 
 
 @click.group(context_settings={"max_content_width": 120})
-def cli():
-    # enable the use of subcommands
-    pass
+@click.option('--debug', is_flag=True, default=False, help='Show full traceback on error')
+@click.pass_context
+def cli(ctx, debug):
+    ctx.ensure_object(dict)
+    ctx.obj['DEBUG'] = debug
 
 
 cli.add_command(configure)
