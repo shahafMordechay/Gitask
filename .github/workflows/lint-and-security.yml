@@ -1,0 +1,25 @@
+name: Lint and Security
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  lint-and-security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          pip install flake8 bandit
+      - name: Lint with flake8
+        run: flake8 gitask/
+      - name: Security scan with bandit
+        run: bandit -r gitask/ 

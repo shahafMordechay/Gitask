@@ -37,8 +37,6 @@ jobs:
 
       - name: Check commit and bump version
         id: version
-        env:
-          GITHUB_OUTPUT: ${{ github.output }}
         run: .github/scripts/check_and_bump.sh
 
       - name: Build and publish to PyPI
