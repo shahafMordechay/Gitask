@@ -1,4 +1,5 @@
 import functools
+import inspect
 
 import click
 
@@ -19,12 +20,14 @@ def with_hooks(action_name):
             config = Config()
             hooks = config.hooks
 
-            # Pass the command parameters (args and kwargs) to the hook scripts
-            command_params = {}
-            if args:
-                command_params['args'] = list(args)
-            if kwargs:
-                command_params.update(kwargs)
+            # Get function signature to map positional args to parameter names
+            sig = inspect.signature(func)
+            bound = sig.bind(*args, **kwargs)
+            bound.apply_defaults()
+            
+            # Build command params dict, excluding 'self'
+            command_params = dict(bound.arguments)
+            command_params.pop('self', None)
 
             if action_name in hooks and 'pre' in hooks[action_name]:
                 utils.run_hook_script(hooks[action_name]['pre'], command_params)
@@ -83,7 +86,7 @@ class Commands:
         """Move the current ticket to In Progress status."""
 
         # Validate that the in progress status is configured
-        if self.config.in_progress_status is None or self.config.in_progress_statuses.length == 0:
+        if self.config.in_progress_statuses is None or len(self.config.in_progress_statuses) == 0:
             raise ValueError("No in progress statuses configured")
 
         # Step 1: Get current ticket
@@ -106,17 +109,17 @@ class Commands:
         """
         if not pr_only_flag:
             # Validate that the in review status is configured
-            if self.config.in_review_statuses is None or self.config.in_review_statuses.length == 0:
+            if self.config.in_review_statuses is None or len(self.config.in_review_statuses) == 0:
                 raise ValueError("No in review statuses configured")
         
             issue_key = self.utils.get_current_ticket()  # Step 1: Get current ticket
             user = self.pmt.get_user_by_username(reviewer)  # Step 2: Get reviewer user object
 
             # Step 3: Update git branch and reviewer
-            if self.config.git_branch_field is not None and self.config.git_branch_field.length > 0:
+            if self.config.git_branch_field is not None and len(self.config.git_branch_field) > 0:
                 self.pmt.update_git_branch(issue_key, self.config.git_branch_field)
                 
-            if self.config.reviewer_field is not None and self.config.reviewer_field.length > 0:
+            if self.config.reviewer_field is not None and len(self.config.reviewer_field) > 0:
                 self.pmt.update_reviewer(issue_key, self.config.reviewer_field, user)
 
             # Step 4: Update ticket status
