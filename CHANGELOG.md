@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-01-10
+
+### Changed
+- Improved hook parameter passing:
+  - Hook scripts now receive command parameters as named parameters instead of positional arguments
+  - Parameters are now accessible by name (e.g., `command_params['title']`) instead of by position
+
+### Fixed
+- Fixed hook configuration prompts to allow skipping by pressing Enter (empty input)
+- Fixed general issues
+
 ## [1.1.0] - 2024-03-19
 
 ### Added
