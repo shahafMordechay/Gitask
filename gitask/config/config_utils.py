@@ -62,12 +62,12 @@ def interactive_setup():
         config["hooks"][command] = {}
         
         # Pre-hook
-        pre_hook = click.prompt(f"  🔹 Pre-{command} script path (leave empty to skip)")
+        pre_hook = click.prompt(f"  🔹 Pre-{command} script path (leave empty to skip)", default="", show_default=False)
         if pre_hook:
             config["hooks"][command]["pre"] = os.path.expanduser(pre_hook)
         
         # Post-hook
-        post_hook = click.prompt(f"  🔹 Post-{command} script path (leave empty to skip)")
+        post_hook = click.prompt(f"  🔹 Post-{command} script path (leave empty to skip)", default="", show_default=False)
         if post_hook:
             config["hooks"][command]["post"] = os.path.expanduser(post_hook)
 
